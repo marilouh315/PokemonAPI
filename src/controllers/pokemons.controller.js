@@ -61,7 +61,7 @@ exports.deletePokemon = (req, res) => {
             } else {
                 // Aucune ligne affectée, le Pokémon avec l'ID n'existe probablement pas
                 res.status(200).json({
-                    message: `Le pokemon avec l'id ${pokemonId} a été supprimé avec succès pour vrai.`
+                    message: `Le pokemon avec l'id ${pokemonId} n'est pas dans la base de donnée.`
                 });
             }
         })
