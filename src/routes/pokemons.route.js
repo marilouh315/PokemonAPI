@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 // À ajuster selon la structure
 const pokemonsController = require('../controllers/pokemons.controller');
-
+// NOTE : Ce ne sont pas les noms de routes qui étaient demandés
 // Afficher un Pokémon par son ID
 router.get('/afficher/:id', pokemonsController.afficherPokemon);
 
