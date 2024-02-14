@@ -4,19 +4,19 @@ const router = express.Router();
 const pokemonsController = require('../controllers/pokemons.controller');
 // NOTE : Ce ne sont pas les noms de routes qui étaient demandés
 // Afficher un Pokémon par son ID
-router.get('/afficher/:id', pokemonsController.afficherPokemon);
+router.get('/:id', pokemonsController.afficherPokemon);
 
 // Ajouter un nouveau Pokémon
-router.post('/ajouter/', pokemonsController.ajouterPokemon);
+router.post('/', pokemonsController.ajouterPokemon);
 
 // Supprimer un Pokémon par son ID
-router.delete('/delete/:id', pokemonsController.deletePokemon);
+router.delete('/:id', pokemonsController.deletePokemon);
 
 // Modifier un Pokémon par son ID
-router.put('/update/:id', pokemonsController.modifierPokemon);
+router.put('/:id', pokemonsController.modifierPokemon);
 
 //Paginer tous les Pokemons (Afficher tous les Pokemons)
-router.get('/liste', pokemonsController.paginerPokemon);
+router.get('/', pokemonsController.paginerPokemon);
 
 
 module.exports = router;

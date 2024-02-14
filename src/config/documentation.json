@@ -1,0 +1,191 @@
+{
+    "openapi": "3.1.0",
+
+    "info":{
+        "title": "Pokemons API",
+        "summary": "API de Pokemons",
+        "description": "API qui permet de faire différentes actions avec la liste de Pokemons",
+        "contact": {
+            "name": "Maril",
+            "url": "",
+            "email": "ne_me_contactez_pas@gmail.com"
+        },
+        "version": "1.0.1"
+    },
+
+    "servers": [
+        {
+            "url": "http://127.0.0.1:3000/",
+            "description": "Serveur de développement"
+        }
+    ],
+
+    "paths" : {
+        "/:id" : {
+            "get": {
+                "description": "Retourne un Pokemon",
+                "summary": "Affiche un Pokemon selon l'id donné",
+                "parameters": [ 
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du Pokemon à afficher",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Le Pokemon choisi est affiché avec succès!",
+                        "content": {
+                            "application/json": {
+                                "schema":{
+                                    "$ref": "#/components/schemas/Pokemon"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erreur lors de la récupération du pokemon avec l'id",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Ajouter un Pokemon",
+                "summary": "Ajoute un nouveau Pokemon dans la liste de Pokemon à la fin",
+                "parameters": 
+                [ 
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID du Pokemon",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "nom",
+                        "in": "query",
+                        "description": "Nom du Pokemon",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "type_primaire",
+                        "in": "query",
+                        "description": "Type primaire du Pokemon",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "type_secondaire",
+                        "in": "query",
+                        "description": "Type secondaire du Pokemon",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "pv",
+                        "in": "query",
+                        "description": "Points de vie du Pokemon",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "attaque",
+                        "in": "query",
+                        "description": "Valeur d'attaque du Pokemon",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "defense",
+                        "in": "query",
+                        "description": "Valeur de défense du Pokemon",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Le Pokemon a été ajouté avec succès!",
+                        "content": {
+                            "application/json": {
+                                "schema":{
+                                    "$ref": "#/components/schemas/Pokemon"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erreur lors de l'ajout du pokemon",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components" : {
+        "schemas": {
+            "Pokemon" : {
+                "type": "object",
+                "properties" : {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "example": "265"
+                    },
+                    "nom": {
+                        "type": "string",
+                        "example": "Gligar"
+                    },
+                    "type_primaire": {
+                        "type": "string",
+                        "example": "Ground"                                        
+                    },
+                    "type_secondaire": {
+                        "type": "string",
+                        "example": "Flying"
+                    },
+                    "pv": {
+                        "type": "int",
+                        "minimum": 0,
+                        "example": "65"
+                    },
+                    "attaque": {
+                        "type": "int",
+                        "minimum": 0,
+                        "example": "75"
+                    },
+                    "defense": {
+                        "type": "int",
+                        "minimum": 0,
+                        "example": "105"
+                    }
+                }
+            }
+        }
+    }
+
+    
+}
