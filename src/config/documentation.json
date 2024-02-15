@@ -21,6 +21,57 @@
     ],
 
     "paths" : {
+        "/liste": {
+            "get": {
+                "description": "Retourne la liste de tous les Pokemons",
+                "summary": "Liste des Pokemons en entier",
+                "parameters": [ 
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Numéro de la page à afficher (par défaut: 1)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Type primaire du Pokemon à filtrer (par défaut: tous)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Grass"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Succès de la requête",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PokemonList"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erreur lors de la récupération du pokemon avec l'id",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "error": "Une erreur s'est produite lors de l'affichage paginée de tous les Pokemons"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/:id" : {
             "get": {
                 "description": "Retourne un Pokemon",
@@ -50,7 +101,11 @@
                     "404": {
                         "description": "Erreur lors de la récupération du pokemon avec l'id",
                         "content": {
-                            "application/json": {}
+                            "application/json": {
+                                "example": {
+                                    "error": "Une erreur s'est produite lors de l'affichage d'un Pokemon"
+                                }
+                            }
                         }
                     }
                 }
@@ -138,7 +193,137 @@
                     "404": {
                         "description": "Erreur lors de l'ajout du pokemon",
                         "content": {
-                            "application/json": {}
+                            "application/json": {
+                                "example": {
+                                    "error": "Une erreur s'est produite lors de l'ajout d'un Pokemon"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update des Pokemons",
+                "summary": "Modifie et change les valeurs des Pokemons",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "ID du Pokemon",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "nom",
+                        "in": "query",
+                        "description": "Nom du Pokemon",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "type_primaire",
+                        "in": "query",
+                        "description": "Type primaire du Pokemon",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "type_secondaire",
+                        "in": "query",
+                        "description": "Type secondaire du Pokemon",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "pv",
+                        "in": "query",
+                        "description": "Points de vie du Pokemon",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "attaque",
+                        "in": "query",
+                        "description": "Valeur d'attaque du Pokemon",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "defense",
+                        "in": "query",
+                        "description": "Valeur de défense du Pokemon",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Le Pokemon a été modifié avec succès!",
+                        "content": {
+                            "application/json": {
+                                "schema":{
+                                    "$ref": "#/components/schemas/Pokemon"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erreur lors de l'update du pokemon",
+                        "application/json": {
+                            "example": {
+                                "error": "Une erreur s'est produite lors de l'update du Pokemon"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Supprime un Pokemon",
+                "summary": "Supprime un Pokemon selon l'id donné",
+                "parameters": [ 
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du Pokemon à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Le Pokemon a été supprimé avec succès!",
+                        "content": {
+                            "application/json": {
+                                "schema":{
+                                    "$ref": "#/components/schemas/Pokemon"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Erreur lors de la suppression du pokemon avec l'id",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "error": "Une erreur s'est produite lors de la suppression d'un Pokemon"
+                                }
+                            }
                         }
                     }
                 }
@@ -183,7 +368,34 @@
                         "example": "105"
                     }
                 }
-            }
+            },
+            "PokemonList": {
+                "type": "object",
+                "properties": {
+                    "pokemons": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Pokemon"
+                        }
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "Type primaire utilisé pour filtrer les Pokemons"
+                    },
+                    "nombrePokemonTotal": {
+                        "type": "integer",
+                        "description": "Nombre total de Pokemons correspondant aux filtres appliqués"
+                    },
+                    "page": {
+                        "type": "integer",
+                        "description": "Numéro de la page affichée"
+                    },
+                    "totalPage": {
+                        "type": "integer",
+                        "description": "Nombre total de pages pour la pagination"
+                    }
+                }
+            }            
         }
     }
 

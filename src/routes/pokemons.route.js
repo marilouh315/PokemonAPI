@@ -3,6 +3,9 @@ const router = express.Router();
 // À ajuster selon la structure
 const pokemonsController = require('../controllers/pokemons.controller');
 
+//Paginer tous les Pokemons (Afficher tous les Pokemons)
+router.get('/liste', pokemonsController.paginerPokemon);
+
 // Afficher un Pokémon par son ID
 router.get('/:id', pokemonsController.afficherPokemon);
 
@@ -14,9 +17,6 @@ router.delete('/:id', pokemonsController.deletePokemon);
 
 // Modifier un Pokémon par son ID
 router.put('/:id', pokemonsController.modifierPokemon);
-
-//Paginer tous les Pokemons (Afficher tous les Pokemons)
-router.get('/', pokemonsController.paginerPokemon);
 
 
 module.exports = router;
