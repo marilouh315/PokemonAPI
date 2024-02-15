@@ -16,6 +16,7 @@ exports.afficherPokemon = (req, res) => {
     // Si c'est un succès
     .then((pokemons) => {
         // S'il n'y a aucun résultat, on retourne un message d'erreur avec le code 404
+        // NOTE : Le modèle devrait retourner un tableau vide si aucun résultat n'est trouvé et non pas null
         if (!pokemons) {
             res.status(404);
             res.send({
@@ -49,7 +50,7 @@ exports.deletePokemon = (req, res) => {
         });
         return;
     }
-
+    // NOTE : Tu devais retourner un message d'erreur si l'ID est inexistant
     // Appel à la fonction deletePokemon dans le modèle
     Pokemons.deletePokemon(pokemonId)
         .then((resultat) => {
@@ -60,6 +61,7 @@ exports.deletePokemon = (req, res) => {
                 });
             } else {
                 // Aucune ligne affectée, le Pokémon avec l'ID n'existe probablement pas
+                // NOTE : Donc pourquoi retourner un code 200 si le Pokémon n'a pas été supprimé?
                 res.status(200).json({
                     message: `Le pokemon avec l'id ${pokemonId} n'est pas dans la base de donnée.`
                 });
@@ -84,8 +86,9 @@ exports.modifierPokemon = (req, res) => {
         });
         return;
     }
-
+    // NOTE : Tu devais retourner les champs obligatoires manquants dans une réponse
     // Appel à la fonction pour mettre à jour le Pokémon dans le modèle
+    // NOTE : Tu dois vérifier si le Pokémon existe avant de le modifier
     Pokemons.modifierPokemon(
         req.query.nom || null,
         req.query.type_primaire || null,
@@ -145,6 +148,7 @@ exports.ajouterPokemon = (req, res) => {
         attaque = null,
         defense = null
     } = req.body;
+    // NOTE : Tu devais retourner les champs obligatoires manquants dans une réponse
 
     // Appel à la fonction ajouterPokemon dans le modèle
     Pokemons.ajouterPokemon(
@@ -159,7 +163,7 @@ exports.ajouterPokemon = (req, res) => {
     .then((resultat) => {
         const idPokemon = resultat.insertId; // Récupérer l'ID du Pokemon nouvellement ajouté
         const successMessage = `Le Pokemon ${req.body.nom} (ID: ${idPokemon}) a été ajouté avec succès!`;
-
+        // NOTE : Le format de la réponse n'est pas conforme à ce qui était demandé
         res.send({ success: true, message: successMessage, resultat });
     })
     // S'il y a eu une erreur au niveau de la requête, on retourne une erreur 500 car c'est du serveur que provient l'erreur.
@@ -178,7 +182,7 @@ exports.paginerPokemon = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const type = req.query.type || '';
-
+        // NOTE : Dans le modèle tu devrais seulement récupérer les données brutes et les formater ici
         const resultat = await Pokemons.paginerPokemon(page, type);
         res.status(200).json(resultat);
     } catch (erreur) {

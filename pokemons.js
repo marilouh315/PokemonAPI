@@ -28,7 +28,7 @@ app.get('/bienvenuePokemons', (req, res) => {
     res.send("<h1>Exercice formatif sur les PoKEmOnS</h1>");
 });
 
-app.use('/pokemons', pokemonsRoutes);
+app.use('/api/pokemons', pokemonsRoutes);
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
