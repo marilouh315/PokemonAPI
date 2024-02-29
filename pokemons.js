@@ -1,6 +1,9 @@
 const express = require('express');
 const morgan = require('morgan');
 
+const app = express();
+const port = 3000;
+
 // Importation du module swagger-ui-express
 const swaggerUi = require('swagger-ui-express');
 // Le fichier de documentation JSON, ajustez selon votre projet
@@ -12,23 +15,29 @@ const swaggerOptions = {
     customSiteTitle: "Demo API"
 };
 
-const pokemonsRoutes = require('./src/routes/pokemons.route'); // Assurez-vous de mettre le chemin correct
 
-const app = express();
-const port = 3000;
 
 app.use(morgan('dev'));
 app.use(express.json());
 
-// Routes
+// Routes DOCUMENTATION
 // La route à utiliser pour accéder au rendu visuel de la documentation
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
 
+//Route ACCEUIL
 app.get('/bienvenuePokemons', (req, res) => {
     res.send("<h1>Exercice formatif sur les PoKEmOnS</h1>");
 });
 
+//Routes POKEMONS
+const pokemonsRoutes = require('./src/routes/pokemons.route'); // Assurez-vous de mettre le chemin correct
 app.use('/api/pokemons', pokemonsRoutes);
+
+//Routes UTILISATEURS
+const usersRoutes = require('./src/routes/users.route');
+app.use('/api/users', usersRoutes);
+
+
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);

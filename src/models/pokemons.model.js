@@ -158,5 +158,24 @@ Pokemons.paginerPokemon = (page = 1, type = '') => {
 };
 
 
+/**
+ * Validation de la clé API dans la base de données
+ * @param {string} cleApi - Clé API à valider
+ * @returns {Promise<boolean>} - Résultat de la validation (true si la clé API est valide, sinon false)
+ */
+// Pokemons.static.validationCle = (cleApi) => {
+//     return new Promise((resolve, reject) => {
+//         const requete = 'SELECT COUNT(*) AS nbUsager FROM usager u WHERE cle_api = ?; ';
+//         const parametres = [cleApi];
+
+//         sql.query(requete, parametres, (erreur, resultat) => {
+//             if (erreur) {
+//                 console.log(`Erreur sqlState ${erreur.sqlState} : ${erreur.sqlMessage}`);
+//                 reject(erreur);
+//             }
+//             resolve(resultat[0].nbUsager > 0);   
+//         });
+//     });
+// }
 
 module.exports = Pokemons;
