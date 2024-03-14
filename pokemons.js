@@ -20,12 +20,11 @@ const swaggerOptions = {
 app.use(morgan('dev'));
 app.use(express.json());
 
-// Routes DOCUMENTATION
-// La route à utiliser pour accéder au rendu visuel de la documentation
+// Routes DOCUMENTATION : La route à utiliser pour accéder au rendu visuel de la documentation
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
 
 //Route ACCEUIL
-app.get('/bienvenuePokemons', (req, res) => {
+app.get('api/bienvenuePokemons', (req, res) => {
     res.send("<h1>Exercice formatif sur les PoKEmOnS</h1>");
 });
 

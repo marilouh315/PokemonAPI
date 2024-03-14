@@ -2,37 +2,40 @@ const Pokemons = require("../models/pokemons.model.js");
 
 //AFFICHER POKEMON - VÉRIFICATION ID
 exports.afficherPokemon = (req, res) => {
+    const id_pokemon = parseInt(req.params.id);
+
     // Teste si le paramètre id est présent et valide
-    if(!req.params.id || parseInt(req.params.id) <= 0){
+    if(!id_pokemon || parseInt(id_pokemon) <= 0){
         res.status(400);
         res.send({
-            message: "L'id du pokemon est obligatoire et doit être supérieur à 0 (afficher)"
+            message: "Pour retourner un Pokemon, l'id du pokemon est obligatoire et doit être supérieur à 0"
         });
         return;
     }
 
     // Appel à la fonction afficherPokemon dans le modèle
-    Pokemons.afficherPokemon(req.params.id)
+    Pokemons.afficherPokemon(id_pokemon)
     // Si c'est un succès
-    .then((pokemons) => {
+    .then((pokemon_resultat) => {
         // S'il n'y a aucun résultat, on retourne un message d'erreur avec le code 404
         // NOTE : Le modèle devrait retourner un tableau vide si aucun résultat n'est trouvé et non pas null
-        if (!pokemons) {
+        if (!pokemon_resultat) {
             res.status(404);
             res.send({
-                message: `Pokemon introuvable avec l'id ${req.params.id} (afficher)`
+                message: `Pokemon introuvable avec l'id ${id_pokemon}`
             });
             return;
         }
-        // Sinon on retourne le premier objet du tableau de résultat car on ne devrait avoir qu'un pokemon par id
-        res.send(pokemons);
+        else {
+            res.send(pokemon_resultat);
+        }        
     })
     // S'il y a eu une erreur au niveau de la requête, on retourne un erreur 500 car c'est du serveur que provient l'erreur.
     .catch((erreur) => {
         console.log('Erreur : ', erreur);
         res.status(500)
         res.send({
-            message: "Erreur lors de la récupération du pokemon avec l'id " + req.params.id + "(afficher)"
+            message: "Erreur lors de la récupération du pokemon avec l'id " + id_pokemon
         });
     });
 };
@@ -43,87 +46,82 @@ exports.afficherPokemon = (req, res) => {
 //SUPPRIMER POKEMON - VÉRIFICATION ID
 exports.deletePokemon = (req, res) => {
     // Teste si le paramètre id est présent et valide
-    const pokemonId = parseInt(req.params.id);
-    if (!pokemonId || pokemonId <= 0) {
+    const id_pokemon = parseInt(req.params.id);
+
+    if (!id_pokemon || id_pokemon <= 0) {
         res.status(400).json({
-            message: "L'id du pokemon est obligatoire et doit être supérieur à 0 (delete)"
+            message: "L'id du pokemon est obligatoire et doit être supérieur à 0."
         });
         return;
     }
-    // NOTE : Tu devais retourner un message d'erreur si l'ID est inexistant
+
     // Appel à la fonction deletePokemon dans le modèle
-    Pokemons.deletePokemon(pokemonId)
-        .then((resultat) => {
-            // Vérifie si la suppression a réussi (au moins une ligne affectée)
-            if (resultat.affectedRows > 0) {
-                res.status(200).json({
-                    message: `Le pokemon avec l'id ${pokemonId} a été supprimé avec succès.`
-                });
-            } else {
-                // Aucune ligne affectée, le Pokémon avec l'ID n'existe probablement pas
-                // NOTE : Donc pourquoi retourner un code 200 si le Pokémon n'a pas été supprimé?
-                res.status(200).json({
-                    message: `Le pokemon avec l'id ${pokemonId} n'est pas dans la base de donnée.`
-                });
-            }
-        })
-        .catch((erreur) => {
-            console.log('Erreur : ', erreur);
-            res.status(500).json({
-                message: `Erreur lors de la suppression du pokemon avec l'id ${pokemonId} (delete)`
-            });
+    Pokemons.deletePokemon(id_pokemon)
+    .then(resultat_delete => {
+        res.send(`Le pokemon avec l'id ${id_pokemon} a été supprimé avec succès.`);
+        res.status(200).json(resultat_delete);
+    })
+    .catch((erreur) => {
+        console.log('Erreur : ', erreur);
+        res.status(500).json({
+            message: `Erreur lors de la suppression du pokemon avec l'id ${id_pokemon}`
         });
+    });
 };
 
 
 
 // MODIFIER POKEMON - VÉRIFICATION
 exports.modifierPokemon = (req, res) => {
-    // Teste si les paramètres sont présents et valides
-    if (!req.params.id) {
-        res.status(400).json({
-            message: "L'ID du Pokémon est requis pour effectuer une modification. (modifier)"
+    const {
+        id,
+        nom,
+        type_primaire,
+        type_secondaire,
+        pv,
+        attaque,
+        defense
+    } = req.body;
+
+    if (!id || !nom || !type_primaire || !type_secondaire || pv === undefined || attaque === undefined || defense === undefined) {
+        return res.status(400).json({
+            erreur: "Le format des données est invalide",
+            champ_manquant: ["id", "nom", "type_primaire", "type_secondaire", "pv", "attaque", "defense"]
         });
-        return;
     }
-    // NOTE : Tu devais retourner les champs obligatoires manquants dans une réponse
+
     // Appel à la fonction pour mettre à jour le Pokémon dans le modèle
-    // NOTE : Tu dois vérifier si le Pokémon existe avant de le modifier
     Pokemons.modifierPokemon(
-        req.query.nom || null,
-        req.query.type_primaire || null,
-        req.query.type_secondaire || null,
-        req.query.pv || null,
-        req.query.attaque || null,
-        req.query.defense || null,
-        req.params.id
+        nom,
+        type_primaire,
+        type_secondaire,
+        pv,
+        attaque,
+        defense,
+        id
     )
-        .then((resultat) => {
-            if (resultat.successMessage) {
-                res.status(200).json({
-                    message: resultat.successMessage,
-                    pokemon: {
-                        id: req.params.id,
-                        nom: req.query.nom || null,
-                        type_primaire: req.query.type_primaire || null,
-                        type_secondaire: req.query.type_secondaire || null,
-                        pv: req.query.pv || null,
-                        attaque: req.query.attaque || null,
-                        defense: req.query.defense || null
-                    }
-                });
-            } else {
-                res.status(404).json({
-                    message: `Le Pokémon avec l'ID ${req.params.id} n'existe pas dans la base de données. Aucune mise à jour effectuée. (midifier2)`
-                });
-            }
-        })
-        .catch((erreur) => {
-            console.log('Erreur : ', erreur);
-            res.status(500).json({
-                message: "Erreur lors de la mise à jour du Pokémon avec l'ID " + req.params.id + "(modifier)"
+    .then((resultat_update) => {
+        if (resultat_update) {
+            res.status(200).json({
+                message: `Le Pokémon avec l'ID ${id} a été mis à jour avec succès`,
+                pokemon: {
+                    id,
+                    nom,
+                    type_primaire,
+                    type_secondaire,
+                    pv,
+                    attaque,
+                    defense
+                }
             });
+        } 
+    })
+    .catch((erreur) => {
+        console.log('Erreur : ', erreur);
+        res.status(500).json({
+            message: `Erreur lors de la mise à jour du Pokémon avec l'ID ${id}`
         });
+    });
 };
 
 
@@ -131,28 +129,26 @@ exports.modifierPokemon = (req, res) => {
 
 //CRÉER POKEMON - VÉRIFICATION ID
 exports.ajouterPokemon = (req, res) => {
-    // Vérifie si le nom du pokemon a été donné
-    if (!req.body.nom) {
-        res.status(400);
-        res.send({
-            message: "Le nom du pokemon doit être donné."
-        });
-        return;
-    }
-
     // Récupère les autres paramètres du corps de la requête ou les initialise à null
     const {
-        type_primaire = null,
-        type_secondaire = null,
-        pv = null,
-        attaque = null,
-        defense = null
+        nom,
+        type_primaire,
+        type_secondaire,
+        pv,
+        attaque,
+        defense
     } = req.body;
-    // NOTE : Tu devais retourner les champs obligatoires manquants dans une réponse
+
+    if (!nom || !type_primaire || !type_secondaire || pv === undefined || attaque === undefined || defense === undefined) {
+        return res.status(400).json({
+            erreur: "Le format des données est invalide",
+            champ_manquant: ["nom", "type_primaire", "type_secondaire", "pv", "attaque", "defense"]
+        });
+    }
 
     // Appel à la fonction ajouterPokemon dans le modèle
     Pokemons.ajouterPokemon(
-        req.body.nom,
+        nom,
         type_primaire,
         type_secondaire,
         pv,
@@ -160,11 +156,21 @@ exports.ajouterPokemon = (req, res) => {
         defense
     )
     // Si c'est un succès
-    .then((resultat) => {
-        const idPokemon = resultat.insertId; // Récupérer l'ID du Pokemon nouvellement ajouté
-        const successMessage = `Le Pokemon ${req.body.nom} (ID: ${idPokemon}) a été ajouté avec succès!`;
-        // NOTE : Le format de la réponse n'est pas conforme à ce qui était demandé
-        res.send({ success: true, message: successMessage, resultat });
+    .then((resultat_ajoute) => {
+        if (resultat_ajoute){
+            const last_pokemonID = resultat_ajoute.insertId; // Récupérer l'ID du Pokemon nouvellement ajouté
+            res.status(201).json({
+                message: `Le Pokemon ${nom} (ID: ${last_pokemonID}) a été ajouté avec succès!`,
+                pokemon: {
+                    nom,
+                    type_primaire,
+                    type_secondaire,
+                    pv,
+                    attaque,
+                    defense
+                }
+            });
+        }
     })
     // S'il y a eu une erreur au niveau de la requête, on retourne une erreur 500 car c'est du serveur que provient l'erreur.
     .catch((erreur) => {
@@ -179,14 +185,49 @@ exports.ajouterPokemon = (req, res) => {
 
 //PAGINER POKEMON - VERIFICATION
 exports.paginerPokemon = async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const type = req.query.type || '';
-        // NOTE : Dans le modèle tu devrais seulement récupérer les données brutes et les formater ici
-        const resultat = await Pokemons.paginerPokemon(page, type);
-        res.status(200).json(resultat);
-    } catch (erreur) {
-        console.error(erreur);
-        res.status(500).json(erreur);
+
+    type = req.params.type.toLowerCase();
+
+    var page = parseInt(req.query.page);
+    //Mettre par défaut la première page 
+    if (page <= 0 || page == null || !req.query.page || isNaN(page)){
+        page = 1;
     }
+
+    const limit = 10;
+    const offset = (page - 1) * limit;
+
+    const prochain = netflix_resultat.length === limit; // Vérifie si la longueur des résultats est égale à la limite (ce qui signifie qu'il y a plus de résultats à afficher)
+
+    let prochainURL = null;
+    if (prochain) {
+        prochainURL = "/api/liste/:" + type + "?page=" + (page + 1);
+    }
+
+    // Appel à la fonction d'afficher un film ou série
+    Pokemons.paginerPokemon(type, offset)
+    // Si c'est un succès
+    .then((liste_resultat) => {
+        // S'il n'y a aucun résultat, on retourne un message d'erreur avec le code 400
+        if (!liste_resultat) {
+            res.status(400);
+            res.send({
+                "erreur": `Le type '${type}' est invalide`
+            });
+            return;
+        }
+        res.status(200).json({
+            result: liste_resultat,
+            filtre: type,
+            page: page,
+            url_page_suivante: prochainURL
+        });
+    })
+    .catch((erreur) => {
+        console.log('Erreur : ', erreur);
+        res.status(500)
+        res.send({
+            message: "Erreur lors de la récupération des listes Pokemons"
+        });
+    });
 };

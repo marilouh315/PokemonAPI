@@ -16,19 +16,14 @@ const Pokemons = (pokemons) => {
  */
 Pokemons.afficherPokemon = (id) => {
     return new Promise((resolve, reject) => {
-        const requete = 'SELECT nom, type_primaire, type_secondaire, pv, attaque, defense FROM pokemon WHERE id = ?';
-        const params = [id]
+        const requete = 'SELECT * FROM pokemon WHERE id = ?';
+        const params = [id];
 
         sql.query(requete, params, (erreur, resultat) => {
             if (erreur) {
                 reject(erreur);
             }
-
-            const successMessage = `Le Pokemon (ID: ${id}) est affiché avec succès!`;
-
-            resolve({ successMessage, resultat });
-            
-
+            resolve({ resultat });
         })
     })
 }
@@ -52,11 +47,7 @@ Pokemons.ajouterPokemon = (nouvNom, nouvTypePrimaire, nouvTypeSecondaire, nouvPV
             if (erreur) {
                 reject(erreur);
             }
-
-            const idPokemon = resultat.insertId; // Récupérer l'ID du Pokemon nouvellement ajouté
-            const successMessage = `Le Pokemon ${nouvNom} (ID: ${idPokemon}) a été ajouté avec succès!`;
-
-            resolve({ successMessage, resultat });
+            resolve({ resultat });
         })
     })
 }
@@ -73,18 +64,27 @@ Pokemons.ajouterPokemon = (nouvNom, nouvTypePrimaire, nouvTypeSecondaire, nouvPV
  * @returns Si fonctionne, me retourne mon résultat sinon retourne erreur
  */
 Pokemons.modifierPokemon = (updateNom, updateTypePrimaire, updateTypeSecondaire, updatePV, updateAttaque, updateDefense, id) => {
+    const update_requete = 'UPDATE pokemon SET nom = ?, type_primaire= ?, type_secondaire= ?, pv= ?, attaque= ?, defense= ? WHERE id = ?';
+    const select_requete = 'SELECT * FROM pokemon WHERE id = ?'; //Pour aller vérifier si le id est présent dans la BD
     return new Promise((resolve, reject) => {
-        const requete = 'UPDATE pokemon SET nom = ?, type_primaire= ?, type_secondaire= ?, pv= ?, attaque= ?, defense= ? WHERE id = ?';
-        const params = [updateNom, updateTypePrimaire, updateTypeSecondaire, updatePV, updateAttaque, updateDefense, id]
+        const params_update = [updateNom, updateTypePrimaire, updateTypeSecondaire, updatePV, updateAttaque, updateDefense, id]
+        const params_select = [id]
 
-        sql.query(requete, params, (erreur, resultat) => {
+        sql.query(select_requete, params_select, (erreur, select_resultat) => {
             if (erreur) {
+                console.error('Erreur lors de la récupération du id du pokémon :', erreur);
                 reject(erreur);
             }
-
-            const successMessage = `Le Pokemon ${updateNom} (ID: ${id}) a été modifié avec succès!`;
-
-            resolve({ successMessage, resultat });
+            else {
+                sql.query(update_requete, params_update, (erreur, update_resultat) => {
+                    if (erreur) {
+                        reject(erreur);
+                    }
+                    else {
+                        resolve({ update_resultat });
+                    }
+                })
+            }
         })
     })
 }
@@ -95,18 +95,27 @@ Pokemons.modifierPokemon = (updateNom, updateTypePrimaire, updateTypeSecondaire,
  * @returns Si fonctionne, me retourne mon résultat sinon retourne erreur
  */
 Pokemons.deletePokemon = (id) => {
+    const delete_requete = 'DELETE FROM pokemon WHERE id = ?';
+    const select_requete = 'SELECT * FROM pokemon WHERE id = ?'; //Pour aller vérifier si le id est présent dans la BD
     return new Promise((resolve, reject) => {
-        const requete = 'DELETE FROM pokemon WHERE id = ?'; // Ajout de "FROM" et correction de la clause WHERE
         const params = [id];
 
-        sql.query(requete, params, (erreur, resultat) => {
+        sql.query(delete_requete, params, (erreur, delete_resultat) => {
             if (erreur) {
+                console.error('Erreur lors de la suppression du pokémon :', err);
                 reject(erreur);
             }
-
-            const successMessage = `Le Pokemon (ID: ${id}) a été supprimé avec succès!`;
-
-            resolve({ successMessage, resultat });
+            else {
+                sql.query(select_requete, params, (erreur, select_resultat) => {
+                    if (erreur) {
+                        console.error('Erreur lors de la récupération du pokémon :', err);
+                        reject(erreur);
+                    }
+                    else {
+                        resolve(select_resultat);
+                    }
+                });
+            }
         });
     });
 };
@@ -114,48 +123,24 @@ Pokemons.deletePokemon = (id) => {
 
 
 /**
- * Affiche tous les Pokemons sur plusieurs pages
- * @param {*} page 
- * @param {*} type 
- * @returns 
+ * Affiche les Pokemons selon une pagination de 10 Pokemons par page maximum
+ * @param {Le type du Pokemon} type
+ * @param {Offset pour aller chercher à bonds de 10} offset 
+ * @returns Si fonctionne, me retourne mon résultat sinon retourne erreur
  */
-Pokemons.paginerPokemon = (page = 1, type = '') => {
+Pokemons.paginerPokemon = (type, offset) => {
     return new Promise((resolve, reject) => {
-        const limit = 25;
-        const offset = (page - 1) * limit;
+        const requete = 'SELECT id, nom FROM pokemon WHERE type_primaire = ? ORDER BY id LIMIT 10 OFFSET ?';
+        const parametre_type = [type, offset];
 
-        const typeFilter = type ? `WHERE type_primaire = '${type}'` : '';
-
-        const requete = `SELECT * FROM pokemon ${typeFilter} LIMIT ${limit} OFFSET ${offset}`;
-
-        sql.query(requete, (erreur, resultat) => {
+        sql.query(requete, parametre_type, (erreur, resultat) => {
             if (erreur) {
-                reject({ erreur: "Echec lors de la récupération de la liste des pokemons" });
+                reject(erreur);
             }
-
-            const requeteCount = `SELECT COUNT(*) AS total FROM pokemon ${typeFilter}`;
-            sql.query(requeteCount, (erreurCount, resultatCount) => {
-                if (erreurCount) {
-                    reject({ erreur: "Echec lors de la récupération du nombre total de pokemons" });
-                }
-
-                const total = resultatCount[0].total;
-
-                const successMessage = `Voici la liste de tous les Pokemons`;
-                const totalPage = Math.ceil(total / limit);
-
-                resolve({
-                    successMessage,
-                    pokemons: resultat,
-                    type: type || '',
-                    nombrePokemonTotal: total,
-                    page: page,
-                    totalPage: totalPage
-                });
-            });
-        });
-    });
-};
+            resolve(resultat);
+        })
+    })
+}
 
 
 /**
