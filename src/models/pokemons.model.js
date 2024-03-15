@@ -1,4 +1,4 @@
-const sql = require("../config/db.js");
+const sql = require("../config/db_pg.js");
 
 const Pokemons = (pokemons) => {
     this.nom = pokemons.nom;
@@ -16,14 +16,14 @@ const Pokemons = (pokemons) => {
  */
 Pokemons.afficherPokemon = (id) => {
     return new Promise((resolve, reject) => {
-        const requete = 'SELECT * FROM pokemon WHERE id = ?';
+        const requete = 'SELECT * FROM pokemon WHERE id = $1';
         const params = [id];
 
         sql.query(requete, params, (erreur, resultat) => {
             if (erreur) {
                 reject(erreur);
             }
-            resolve({ resultat });
+            resolve( resultat.rows );
         })
     })
 }
@@ -40,14 +40,14 @@ Pokemons.afficherPokemon = (id) => {
  */
 Pokemons.ajouterPokemon = (nouvNom, nouvTypePrimaire, nouvTypeSecondaire, nouvPV, nouvAttaque, nouvDefense) => {
     return new Promise((resolve, reject) => {
-        const requete = 'INSERT INTO pokemon (nom, type_primaire, type_secondaire, pv, attaque, defense) VALUES (?, ?, ?, ?, ?, ?)';
+        const requete = 'INSERT INTO pokemon (nom, type_primaire, type_secondaire, pv, attaque, defense) VALUES ($1, $2, $3, $4, $5, $6)';
         const params = [nouvNom, nouvTypePrimaire, nouvTypeSecondaire, nouvPV, nouvAttaque, nouvDefense]
 
         sql.query(requete, params, (erreur, resultat) => {
             if (erreur) {
                 reject(erreur);
             }
-            resolve({ resultat });
+            resolve(resultat.rows);
         })
     })
 }
@@ -64,8 +64,8 @@ Pokemons.ajouterPokemon = (nouvNom, nouvTypePrimaire, nouvTypeSecondaire, nouvPV
  * @returns Si fonctionne, me retourne mon résultat sinon retourne erreur
  */
 Pokemons.modifierPokemon = (updateNom, updateTypePrimaire, updateTypeSecondaire, updatePV, updateAttaque, updateDefense, id) => {
-    const update_requete = 'UPDATE pokemon SET nom = ?, type_primaire= ?, type_secondaire= ?, pv= ?, attaque= ?, defense= ? WHERE id = ?';
-    const select_requete = 'SELECT * FROM pokemon WHERE id = ?'; //Pour aller vérifier si le id est présent dans la BD
+    const update_requete = 'UPDATE pokemon SET nom = $1, type_primaire= $2, type_secondaire= $3, pv= $4, attaque= $5, defense= $6 WHERE id = $7';
+    const select_requete = 'SELECT * FROM pokemon WHERE id = $1'; //Pour aller vérifier si le id est présent dans la BD
     return new Promise((resolve, reject) => {
         const params_update = [updateNom, updateTypePrimaire, updateTypeSecondaire, updatePV, updateAttaque, updateDefense, id]
         const params_select = [id]
@@ -81,7 +81,7 @@ Pokemons.modifierPokemon = (updateNom, updateTypePrimaire, updateTypeSecondaire,
                         reject(erreur);
                     }
                     else {
-                        resolve({ update_resultat });
+                        resolve(update_resultat.rows);
                     }
                 })
             }
@@ -95,8 +95,8 @@ Pokemons.modifierPokemon = (updateNom, updateTypePrimaire, updateTypeSecondaire,
  * @returns Si fonctionne, me retourne mon résultat sinon retourne erreur
  */
 Pokemons.deletePokemon = (id) => {
-    const delete_requete = 'DELETE FROM pokemon WHERE id = ?';
-    const select_requete = 'SELECT * FROM pokemon WHERE id = ?'; //Pour aller vérifier si le id est présent dans la BD
+    const delete_requete = 'DELETE FROM pokemon WHERE id = $1';
+    const select_requete = 'SELECT * FROM pokemon WHERE id = $1'; //Pour aller vérifier si le id est présent dans la BD
     return new Promise((resolve, reject) => {
         const params = [id];
 
@@ -112,7 +112,7 @@ Pokemons.deletePokemon = (id) => {
                         reject(erreur);
                     }
                     else {
-                        resolve(select_resultat);
+                        resolve(select_resultat.rows);
                     }
                 });
             }
@@ -130,14 +130,14 @@ Pokemons.deletePokemon = (id) => {
  */
 Pokemons.paginerPokemon = (type, offset) => {
     return new Promise((resolve, reject) => {
-        const requete = 'SELECT id, nom FROM pokemon WHERE type_primaire = ? ORDER BY id LIMIT 10 OFFSET ?';
+        const requete = 'SELECT id, nom FROM pokemon WHERE type_primaire = $1 ORDER BY id LIMIT 10 OFFSET $2';
         const parametre_type = [type, offset];
 
         sql.query(requete, parametre_type, (erreur, resultat) => {
             if (erreur) {
                 reject(erreur);
             }
-            resolve(resultat);
+            resolve(resultat.rows);
         })
     })
 }
