@@ -197,7 +197,7 @@ exports.paginerPokemon = async (req, res) => {
     const limit = 10;
     const offset = (page - 1) * limit;
 
-    const prochain = netflix_resultat.length === limit; // Vérifie si la longueur des résultats est égale à la limite (ce qui signifie qu'il y a plus de résultats à afficher)
+    const prochain = liste_resultat.length === limit; // Vérifie si la longueur des résultats est égale à la limite (ce qui signifie qu'il y a plus de résultats à afficher)
 
     let prochainURL = null;
     if (prochain) {
