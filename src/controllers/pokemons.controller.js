@@ -197,12 +197,12 @@ exports.paginerPokemon = async (req, res) => {
     const limit = 10;
     const offset = (page - 1) * limit;
 
-    const prochain = liste_resultat.length === limit; // Vérifie si la longueur des résultats est égale à la limite (ce qui signifie qu'il y a plus de résultats à afficher)
+    // const prochain = liste_resultat.length === limit; // Vérifie si la longueur des résultats est égale à la limite (ce qui signifie qu'il y a plus de résultats à afficher)
 
-    let prochainURL = null;
-    if (prochain) {
-        prochainURL = "/api/liste/:" + type + "?page=" + (page + 1);
-    }
+    // let prochainURL = null;
+    // if (prochain) {
+    //     prochainURL = "/api/liste/:" + type + "?page=" + (page + 1);
+    // }
 
     // Appel à la fonction d'afficher un film ou série
     Pokemons.paginerPokemon(type, offset)
@@ -220,7 +220,7 @@ exports.paginerPokemon = async (req, res) => {
             result: liste_resultat,
             filtre: type,
             page: page,
-            url_page_suivante: prochainURL
+            url_page_suivante: "/api/liste/:" + type + "?page=" + (page + 1)
         });
     })
     .catch((erreur) => {
