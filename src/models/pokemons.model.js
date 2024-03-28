@@ -143,11 +143,11 @@ Pokemons.paginerPokemon = (offset) => {
 }
 
 
-Pokemons.obtenirTousPokemon = (offset) => {
+Pokemons.obtenirTousPokemon = () => {
     return new Promise((resolve, reject) => {
         const requete = 'SELECT * FROM pokemon ORDER BY id';
 
-        sql.query(requete, parametre_type, (erreur, resultat) => {
+        sql.query(requete, (erreur, resultat) => {
             if (erreur) {
                 reject(erreur);
             }

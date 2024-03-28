@@ -183,7 +183,7 @@ exports.ajouterPokemon = (req, res) => {
 };
 
 exports.obtenirTousPokemon = (req, res) => {
-    Pokemons.obtenirTousPokemon(type, offset)
+    Pokemons.obtenirTousPokemon()
     // Si c'est un succès
     .then((pokemon_resultat) => {
         // S'il n'y a aucun résultat, on retourne un message d'erreur avec le code 400
