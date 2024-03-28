@@ -128,10 +128,10 @@ Pokemons.deletePokemon = (id) => {
  * @param {Offset pour aller chercher à bonds de 10} offset 
  * @returns Si fonctionne, me retourne mon résultat sinon retourne erreur
  */
-Pokemons.paginerPokemon = (type, offset) => {
+Pokemons.paginerPokemon = (offset) => {
     return new Promise((resolve, reject) => {
-        const requete = 'SELECT id, nom FROM pokemon WHERE type_primaire = $1 ORDER BY id LIMIT 10 OFFSET $2';
-        const parametre_type = [type, offset];
+        const requete = 'SELECT id, nom, type_primaire, type_secondaire, pv, attaque, defense FROM pokemon ORDER BY id LIMIT 10 OFFSET $2';
+        const parametre_type = [offset];
 
         sql.query(requete, parametre_type, (erreur, resultat) => {
             if (erreur) {

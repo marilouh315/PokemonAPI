@@ -186,8 +186,6 @@ exports.ajouterPokemon = (req, res) => {
 //PAGINER POKEMON - VERIFICATION
 exports.paginerPokemon = async (req, res) => {
 
-    type = req.params.type.toLowerCase();
-
     var page = parseInt(req.query.page);
     //Mettre par défaut la première page 
     if (page <= 0 || page == null || !req.query.page || isNaN(page)){
@@ -205,14 +203,14 @@ exports.paginerPokemon = async (req, res) => {
     // }
 
     // Appel à la fonction d'afficher un film ou série
-    Pokemons.paginerPokemon(type, offset)
+    Pokemons.paginerPokemon(offset)
     // Si c'est un succès
     .then((liste_resultat) => {
         // S'il n'y a aucun résultat, on retourne un message d'erreur avec le code 400
         if (!liste_resultat) {
             res.status(400);
             res.send({
-                "erreur": `Le type '${type}' est invalide`
+                "erreur": `Aucun résultat trouvé`
             });
             return;
         }
@@ -220,7 +218,7 @@ exports.paginerPokemon = async (req, res) => {
             result: liste_resultat,
             filtre: type,
             page: page,
-            url_page_suivante: "/api/liste/:" + type + "?page=" + (page + 1)
+            url_page_suivante: "/api/liste/:" + (page + 1)
         });
     })
     .catch((erreur) => {
