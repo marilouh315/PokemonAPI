@@ -10,7 +10,7 @@ router.get('/bienvenuePokemons', (req, res) => {
 });
 
 //Paginer tous les Pokemons (Afficher tous les Pokemons)
-router.get('/liste/:type', pokemonsController.paginerPokemon);
+router.get('/liste', pokemonsController.paginerPokemon);
 
 // Afficher un Pokémon par son ID
 router.get('/:id', pokemonsController.afficherPokemon);

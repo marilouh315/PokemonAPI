@@ -218,7 +218,7 @@ exports.paginerPokemon = async (req, res) => {
             result: liste_resultat,
             filtre: type,
             page: page,
-            url_page_suivante: "/api/liste/:" + (page + 1)
+            url_page_suivante: "/api/liste/" + (page + 1)
         });
     })
     .catch((erreur) => {
