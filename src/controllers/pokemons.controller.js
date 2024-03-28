@@ -182,9 +182,35 @@ exports.ajouterPokemon = (req, res) => {
     });
 };
 
+exports.obtenirTousPokemon = (req, res) => {
+    Pokemons.obtenirTousPokemon(type, offset)
+    // Si c'est un succès
+    .then((pokemon_resultat) => {
+        // S'il n'y a aucun résultat, on retourne un message d'erreur avec le code 400
+        if (!pokemon_resultat) {
+            res.status(400);
+            res.send({
+                "erreur": `Il n'y a pas de résultats`
+            });
+            return;
+        }
+        res.status(200).json({
+            result: pokemon_resultat,
+        });
+    })
+    .catch((erreur) => {
+        console.log('Erreur : ', erreur);
+        res.status(500)
+        res.send({
+            message: "Erreur lors de la récupération de tous les# Pokemons"
+        });
+    });
+}
 
 //PAGINER POKEMON - VERIFICATION
 exports.paginerPokemon = async (req, res) => {
+
+    type = req.params.type.toLowerCase();
 
     var page = parseInt(req.query.page);
     //Mettre par défaut la première page 
@@ -195,22 +221,21 @@ exports.paginerPokemon = async (req, res) => {
     const limit = 10;
     const offset = (page - 1) * limit;
 
-    // const prochain = liste_resultat.length === limit; // Vérifie si la longueur des résultats est égale à la limite (ce qui signifie qu'il y a plus de résultats à afficher)
 
-    // let prochainURL = null;
-    // if (prochain) {
-    //     prochainURL = "/api/liste/:" + type + "?page=" + (page + 1);
-    // }
+    let prochainURL = null;
+    if (prochain) {
+        prochainURL = "/api/liste/:" + type + "?page=" + (page + 1);
+    }
 
     // Appel à la fonction d'afficher un film ou série
-    Pokemons.paginerPokemon(offset)
+    Pokemons.paginerPokemon(type, offset)
     // Si c'est un succès
     .then((liste_resultat) => {
         // S'il n'y a aucun résultat, on retourne un message d'erreur avec le code 400
         if (!liste_resultat) {
             res.status(400);
             res.send({
-                "erreur": `Aucun résultat trouvé`
+                "erreur": `Le type '${type}' est invalide`
             });
             return;
         }
@@ -218,7 +243,7 @@ exports.paginerPokemon = async (req, res) => {
             result: liste_resultat,
             filtre: type,
             page: page,
-            url_page_suivante: "/api/liste/" + (page + 1)
+            url_page_suivante: prochainURL
         });
     })
     .catch((erreur) => {

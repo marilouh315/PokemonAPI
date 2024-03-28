@@ -9,8 +9,11 @@ router.get('/bienvenuePokemons', (req, res) => {
     res.send("<h1>Exercice formatif sur les PoKEmOnS</h1>");
 });
 
+// Afficher tous les pokemons
+router.get('/all', pokemonsController.obtenirTousPokemon);
+
 //Paginer tous les Pokemons (Afficher tous les Pokemons)
-router.get('/liste', pokemonsController.paginerPokemon);
+router.get('/liste/:type', pokemonsController.paginerPokemon);
 
 // Afficher un Pokémon par son ID
 router.get('/:id', pokemonsController.afficherPokemon);

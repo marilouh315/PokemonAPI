@@ -143,6 +143,19 @@ Pokemons.paginerPokemon = (offset) => {
 }
 
 
+Pokemons.obtenirTousPokemon = (offset) => {
+    return new Promise((resolve, reject) => {
+        const requete = 'SELECT * FROM pokemon ORDER BY id';
+
+        sql.query(requete, parametre_type, (erreur, resultat) => {
+            if (erreur) {
+                reject(erreur);
+            }
+            resolve(resultat);
+        })
+    })
+}
+
 /**
  * Validation de la clé API dans la base de données
  * @param {string} cleApi - Clé API à valider
